@@ -69,6 +69,9 @@ The following commands are available:
 - `Java:Clean the Java language server workspace`: Clean the Java language server workspace.
 - `Java:Attach Source`: Attach a jar/zip source to the currently opened binary class file. This command is only available in the editor context menu.
 
+*New in 0.56.0:*
+* - `Java:Detect and import Java projects`: Detect and import Java projects.
+
 Supported VS Code settings
 ==========================
 The following settings are supported:
@@ -126,6 +129,7 @@ The following settings are supported:
 New in 0.56.0:
 * `java.import.gradle.offline.enabled`: Enable/disable the Gradle offline mode. Defaults to `false`.
 * `java.configuration.runtimes`: Java Execution Environments.
+* `java.import.newprojects` : Specifies how to detect and import the Java projects when adding a new file in the workspace. Supported values are `disabled` (nothing happens), `interactive` (asks about importing), `automatic` (importing is automatically triggered).
 
 Troubleshooting
 ===============

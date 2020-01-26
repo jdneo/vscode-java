@@ -110,6 +110,19 @@
           "description": "Specifies how modifications on build files update the Java classpath/configuration",
           "scope": "window"
         },
+        "java.import.newprojects": {
+          "type": [
+            "string"
+          ],
+          "enum": [
+            "disabled",
+            "interactive",
+            "automatic"
+          ],
+          "default": "interactive",
+          "description": "Specifies how to detect and import the Java projects when adding a new file in the workspace.",
+          "scope": "window"
+        },
         "java.trace.server": {
           "type": "string",
           "enum": [
@@ -500,6 +513,11 @@
       {
         "command": "java.projectConfiguration.update",
         "title": "Update project configuration",
+        "category": "Java"
+      },
+      {
+        "command": "java.import.newprojects",
+        "title": "Detect and import Java projects",
         "category": "Java"
       },
       {

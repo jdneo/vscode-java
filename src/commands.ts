@@ -35,6 +35,11 @@ export namespace Commands {
     export const CONFIGURATION_UPDATE = 'java.projectConfiguration.update';
 
     /**
+     * Import new projects
+     */
+    export const IMPORT_PROJECTS = 'java.import.newprojects';
+
+    /**
      * Ignore "Incomplete Classpath" messages
      */
     export const IGNORE_INCOMPLETE_CLASSPATH = 'java.ignoreIncompleteClasspath';
@@ -53,6 +58,11 @@ export namespace Commands {
      * Set project configuration update mode
      */
     export const PROJECT_CONFIGURATION_STATUS = 'java.projectConfiguration.status';
+
+    /**
+     * Set import new projects update mode
+     */
+    export const IMPORT_PROJECTS_STATUS = 'java.importProjects.status';
 
     /**
      * Apply Workspace Edit

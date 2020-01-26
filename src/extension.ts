@@ -12,7 +12,7 @@ import * as requirements from './requirements';
 import { Commands } from './commands';
 import {
 	StatusNotification, ClassFileContentsRequest, ProjectConfigurationUpdateRequest, MessageType, ActionableNotification, FeatureStatus, CompileWorkspaceRequest, CompileWorkspaceStatus, ProgressReportNotification, ExecuteClientCommandRequest, SendNotificationRequest,
-	SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute
+	SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ImportNewProjectsRequest
 } from './protocol';
 import { ExtensionAPI, ExtensionApiVersion } from './extension.api';
 import * as buildpath from './buildpath';
@@ -325,6 +325,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 				context.subscriptions.push(commands.registerCommand(Commands.CONFIGURATION_UPDATE, uri => projectConfigurationUpdate(languageClient, uri)));
 
 				context.subscriptions.push(commands.registerCommand(Commands.IGNORE_INCOMPLETE_CLASSPATH, (data?: any) => setIncompleteClasspathSeverity('ignore')));
+				context.subscriptions.push(commands.registerCommand(Commands.IMPORT_PROJECTS, () => importNewProjects(languageClient)));
 
 				context.subscriptions.push(commands.registerCommand(Commands.IGNORE_INCOMPLETE_CLASSPATH_HELP, (data?: any) => {
 					commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse('https://github.com/redhat-developer/vscode-java/wiki/%22Classpath-is-incomplete%22-warning'));
@@ -335,6 +336,8 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 				context.subscriptions.push(commands.registerCommand(Commands.APPLY_WORKSPACE_EDIT, (obj) => {
 					applyWorkspaceEdit(obj, languageClient);
 				}));
+
+				context.subscriptions.push(commands.registerCommand(Commands.IMPORT_PROJECTS_STATUS, (uri, status) => setImportProjects(languageClient, status)));
 
 				context.subscriptions.push(commands.registerCommand(Commands.EXECUTE_WORKSPACE_COMMAND, (command, ...rest) => {
 					const params: ExecuteCommandParams = {
@@ -552,6 +555,12 @@ function projectConfigurationUpdate(languageClient: LanguageClient, uri?: Uri) {
 	}
 }
 
+function importNewProjects(languageClient: LanguageClient) {
+	languageClient.sendNotification(ImportNewProjectsRequest.type, {
+		uri: null
+	});
+}
+
 function setProjectConfigurationUpdate(languageClient: LanguageClient, uri: Uri, status: FeatureStatus) {
 	const config = getJavaConfiguration();
 	const section = 'configuration.updateBuildConfiguration';
@@ -565,6 +574,20 @@ function setProjectConfigurationUpdate(languageClient: LanguageClient, uri: Uri,
 		projectConfigurationUpdate(languageClient, uri);
 	}
 }
+
+function setImportProjects(languageClient: LanguageClient, status: FeatureStatus) {
+	const config = getJavaConfiguration();
+	const section = 'import.newprojects';
+	const st = FeatureStatus[status];
+	config.update(section, st).then(
+		() => console.log(`${section} set to ${st}`),
+		(error) => console.log(error)
+	);
+	if (status !== FeatureStatus.disabled) {
+		importNewProjects(languageClient);
+	}
+}
+
 function isJavaConfigFile(path: String) {
 	return path.endsWith('pom.xml') || path.endsWith('.gradle');
 }

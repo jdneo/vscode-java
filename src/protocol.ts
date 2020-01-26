@@ -100,6 +100,10 @@ export namespace ProjectConfigurationUpdateRequest {
     export const type = new NotificationType<TextDocumentIdentifier, void> ('java/projectConfigurationUpdate');
 }
 
+export namespace ImportNewProjectsRequest {
+    export const type = new NotificationType<TextDocumentIdentifier, void> ('java/importNewProjects');
+}
+
 export namespace ActionableNotification {
     export const type = new NotificationType<ActionableMessage, void>('language/actionableNotification');
 }
