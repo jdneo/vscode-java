@@ -184,4 +184,6 @@ export namespace Commands {
      * Check the input file is a test file or not
      */
     export const IS_TEST_FILE = 'java.project.isTestFile';
+
+    export const LEARN_MORE_ABOUT_REFACTORING = '_java.learnMoreAboutRefactorings';
 }

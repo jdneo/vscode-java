@@ -29,6 +29,8 @@ import { SnippetCompletionProvider } from './snippetCompletionProvider';
 import { serverTasks } from './serverTasks';
 import { serverTaskPresenter } from './serverTaskPresenter';
 import { serverStatus, ServerStatusKind } from './serverStatus';
+import { markdownPreviewProvider } from './markdownPreviewProvider';
+import { RefactorDocumentProvider } from './codeActionProvider';
 
 let languageClient: LanguageClient;
 const jdtEventEmitter = new EventEmitter<Uri>();
@@ -369,6 +371,12 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 						arguments: rest
 					};
 					return languageClient.sendRequest(ExecuteCommandRequest.type, params);
+				}));
+
+				context.subscriptions.push(markdownPreviewProvider);
+				context.subscriptions.push(languages.registerCodeActionsProvider({ scheme: 'file', language: 'java' }, new RefactorDocumentProvider(), RefactorDocumentProvider.metadata));
+				context.subscriptions.push(commands.registerCommand(Commands.LEARN_MORE_ABOUT_REFACTORING, async () => {
+					markdownPreviewProvider.show(context.asAbsolutePath(`${Commands.LEARN_MORE_ABOUT_REFACTORING}.md`), 'Java Refactoring');
 				}));
 
 				context.subscriptions.push(commands.registerCommand(Commands.COMPILE_WORKSPACE, (isFullCompile: boolean) => {
