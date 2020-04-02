@@ -20,7 +20,7 @@ Features
 =========
 ![ screencast ](https://raw.githubusercontent.com/redhat-developer/vscode-java/master/images/vscode-java.0.0.1.gif)
 
-* Supports code from Java 1.5 to Java 13
+* Supports code from Java 1.5 to Java 14
 * Maven pom.xml project support
 * Basic Gradle Java project support (Android not supported)
 * Standalone Java files support
@@ -57,6 +57,29 @@ The path to the Java Development Kit is searched in the following order:
 - the `JDK_HOME` environment variable
 - the `JAVA_HOME` environment variable
 - on the current system path
+
+This JDK will be used to launch the Java Language Server. And by default, will be used to compile your projects.
+
+If you need to compile your projects against a different JDK version, it's recommended you configure the `java.configuration.runtimes` property in your user settings, eg:
+
+```json
+"java.configuration.runtimes": [
+  {
+    "name": "JavaSE-1.8",
+    "path": "/path/to/jdk-8",
+  },
+  {
+    "name": "JavaSE-11",
+    "path": "/path/to/jdk-11",
+  },
+  {
+    "name": "JavaSE-14",
+    "path": "/path/to/jdk-14",
+    "default": true
+  },
+]
+```
+The default runtime will be used when you open standalone Java files.
 
 Available commands
 ==========================
@@ -125,11 +148,17 @@ The following settings are supported:
 * `java.showBuildStatusOnStart.enabled`: Automatically show build status on startup. Defaults to `false`.
 * `java.project.referencedLibraries`: Configure glob patterns for referencing local libraries to a Java project.
 * `java.completion.maxResults`: Maximum number of completion results (not including snippets).Setting 0 will disable the limit and return all results. Be aware the performance will be very negatively impacted.
-
-New in 0.56.0:
 * `java.import.gradle.offline.enabled`: Enable/disable the Gradle offline mode. Defaults to `false`.
-* `java.configuration.runtimes`: Java Execution Environments.
-* `java.import.newprojects` : Specifies how to detect and import the Java projects when adding a new file in the workspace. Supported values are `disabled` (nothing happens), `interactive` (asks about importing), `automatic` (importing is automatically triggered).
+* `java.configuration.runtimes`: Map Java Execution Environments to local JDKs.
+
+New in 0.59.0:
+* `java.import.gradle.user.home`: setting for GRADLE_USER_HOME.
+* `java.server.launchMode`:
+  - `Standard`: Provides full features such as intellisense, refactoring, building, Maven/Gradle support etc...
+  - `LightWeight`: Starts a syntax server with lower start-up cost. Only provides syntax features such as outline, navigation, javadoc, syntax errors. The lightweight mode won't load thirdparty extensions, such as java test runner, java debugger, etc.
+  - `Hybrid`: Provides full features with better responsiveness. It starts a standard language server and a secondary syntax server. The syntax server provides syntax features until the standard server is ready. And the syntax server will be shutdown automatically after the standard server is fully ready.
+
+  Default launch mode is `Hybrid`. Legacy mode is `Standard`
 
 Troubleshooting
 ===============

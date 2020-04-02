@@ -1,5 +1,44 @@
 # Change Log
 
+## 0.59.0 (April 1st 2020)
+ * enhancement - Enable Java 14 support. See [#1300](https://github.com/redhat-developer/vscode-java/pull/1300).
+ * enhancement - Support for JDK 14 for Gradle projects. See [#1338](https://github.com/redhat-developer/vscode-java/issues/1338).
+ * enhancement - Provide `record` snippet. See [JLS#1393](https://github.com/eclipse/eclipse.jdt.ls/issues/1393).
+ * enhancement - No Javadoc completion for records. See [JLS#1396](https://github.com/eclipse/eclipse.jdt.ls/issues/1396).
+ * enhancement - Fill in content for newly created files. See [#1222](https://github.com/redhat-developer/vscode-java/issues/1222).
+ * enhancement - new `java.server.launchMode` to control whether to enable a syntax language server. See [#1329](https://github.com/redhat-developer/vscode-java/pull/1329).
+ * enhancement - j.i.gradle.arguments and j.i.gradle.jvmArguments aren't properly defined. See [JLS#1387](https://github.com/eclipse/eclipse.jdt.ls/pull/1387).
+ * enhancement - enable syntax mode when importing a partial folder of maven/gradle project. See [JLS#1364](https://github.com/eclipse/eclipse.jdt.ls/pull/1364).
+ * enhancement - Add `java.import.gradle.user.home` preference for setting `GRADLE_USER_HOME`. See [#1310](https://github.com/redhat-developer/vscode-java/issues/1310).
+ * bug fix - root path in the preference manager won't update when workspace folder changes. See [JLS#1388](https://github.com/eclipse/eclipse.jdt.ls/issues/1388).
+ * bug fix - BadLocationException and diagnostic with negative line number send to client. See [JLS#1374](https://github.com/eclipse/eclipse.jdt.ls/issues/1374).
+
+## 0.58.0 (March 5th, 2020)
+* enhancement - improved support for "standalone file" use cases. See [#1270](https://github.com/redhat-developer/vscode-java/issues/1270).
+* enhancement - parallel downloads of jars, for Maven projects. See [JLS#1369](https://github.com/eclipse/eclipse.jdt.ls/pull/1369).
+* enhancement - allow renaming of lambda parameters. See [#1298](https://github.com/redhat-developer/vscode-java/issues/1298).
+* enhancement - build workspace action can report progress to client. See [JLS#1368](https://github.com/eclipse/eclipse.jdt.ls/pull/1368).
+* enhancement - VS Code Java cannot run from read-only location. See [#1301](https://github.com/redhat-developer/vscode-java/issues/1301).
+* enhancement - optimize for better memory footprint management. See [#1262](https://github.com/redhat-developer/vscode-java/pull/1262)
+* bug fix - fixed error on cancelling source actions. See [#1292](https://github.com/redhat-developer/vscode-java/pull/1292).
+
+## 0.57.0 (February 19th, 2020)
+* bug fix - fixed Gradle project failing to build while fetching non-existing snapshot distro. See [#1285](https://github.com/redhat-developer/vscode-java/issues/1285).
+* bug fix - fixed Java suggestion details missing in some circumstances. See [#1258](https://github.com/redhat-developer/vscode-java/issues/1258).
+
+## 0.56.0 (February 17th, 2020)
+* enhancement - added `java.import.gradle.offline.enabled` preference. See [#1157](https://github.com/redhat-developer/vscode-java/issues/1157).
+* enhancement - added `java.configuration.runtimes` preference for mapping Java Execution Environments to local JDK runtimes. See [#1207](https://github.com/redhat-developer/vscode-java/pull/1207).
+* enhancement - align settings category name with VS Code recommendations. See [#1227](https://github.com/redhat-developer/vscode-java/issues/1227).
+* enhancement - added code actions to assign statement to new variable/field. See [#1208](https://github.com/redhat-developer/vscode-java/issues/1208).
+* enhancement - added code action to remove redundant interfaces. See [JLS#438](https://github.com/eclipse/eclipse.jdt.ls/issues/438).
+* enhancement - added code actions to remove the `final` modifier. See [JLS#441](https://github.com/eclipse/eclipse.jdt.ls/issues/441).
+* enhancement - added code action to add missing case labels in switch statements. See [JLS#1140](https://github.com/eclipse/eclipse.jdt.ls/issues/1140).
+* bug fix - fixed duplicate labels in progress reports. See [#1230](https://github.com/redhat-developer/vscode-java/issues/1230).
+* bug fix - don't set the -noverify flag if JDK >= 13. See [#1250](https://github.com/redhat-developer/vscode-java/pull/1250).
+* bug fix - fixed Intellisense not working when attached javadoc can't be read. See [JLS#1314](https://github.com/eclipse/eclipse.jdt.ls/pull/1314).
+* bug fix - added default value to `java.project.referencedLibraries`'s exclude and sources. See [JLS#1315](https://github.com/eclipse/eclipse.jdt.ls/pull/1315).
+
 ## 0.55.1 (December 23rd, 2019)
 * bug fix - fixed code completion broken with IntelliCode. See [#1213](https://github.com/redhat-developer/vscode-java/issues/1213).
 
