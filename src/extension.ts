@@ -260,7 +260,6 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 				languageClient.registerProposedFeatures();
 				const getDocumentSymbols: getDocumentSymbolsCommand = getDocumentSymbolsProvider(languageClient);
 
-				context.subscriptions.push(commands.registerCommand(Commands.IGNORE_INCOMPLETE_CLASSPATH, (data?: any) => setIncompleteClasspathSeverity('ignore')));
 				context.subscriptions.push(commands.registerCommand(Commands.IMPORT_PROJECTS, () => importNewProjects(languageClient)));
 				const snippetProvider: SnippetCompletionProvider = new SnippetCompletionProvider();
 				context.subscriptions.push(languages.registerCompletionItemProvider({ scheme: 'file', language: 'java' }, snippetProvider));
@@ -277,15 +276,6 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 					return await commands.executeCommand<boolean>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.IS_TEST_FILE, uri);
 				};
 
-				context.subscriptions.push(commands.registerCommand(Commands.IMPORT_PROJECTS_STATUS, (uri, status) => setImportProjects(languageClient, status)));
-
-				context.subscriptions.push(commands.registerCommand(Commands.EXECUTE_WORKSPACE_COMMAND, (command, ...rest) => {
-					const params: ExecuteCommandParams = {
-						command,
-						arguments: rest
-					};
-					return languageClient.sendRequest(ExecuteCommandRequest.type, params);
-				}));
 				const _onDidClasspathUpdate = new Emitter<Uri>();
 				const onDidClasspathUpdate = _onDidClasspathUpdate.event;
 
@@ -637,19 +627,6 @@ function setProjectConfigurationUpdate(languageClient: LanguageClient, uri: Uri,
 	);
 	if (status !== FeatureStatus.disabled) {
 		projectConfigurationUpdate(languageClient, uri);
-	}
-}
-
-function setImportProjects(languageClient: LanguageClient, status: FeatureStatus) {
-	const config = getJavaConfiguration();
-	const section = 'import.newprojects';
-	const st = FeatureStatus[status];
-	config.update(section, st).then(
-		() => console.log(`${section} set to ${st}`),
-		(error) => console.log(error)
-	);
-	if (status !== FeatureStatus.disabled) {
-		importNewProjects(languageClient);
 	}
 }
 

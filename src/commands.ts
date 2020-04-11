@@ -60,11 +60,6 @@ export namespace Commands {
     export const PROJECT_CONFIGURATION_STATUS = 'java.projectConfiguration.status';
 
     /**
-     * Set import new projects update mode
-     */
-    export const IMPORT_PROJECTS_STATUS = 'java.importProjects.status';
-
-    /**
      * Apply Workspace Edit
      */
     export const APPLY_WORKSPACE_EDIT = 'java.apply.workspaceEdit';

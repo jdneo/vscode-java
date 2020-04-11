@@ -92,9 +92,6 @@ The following commands are available:
 - `Java:Clean the Java language server workspace`: Clean the Java language server workspace.
 - `Java:Attach Source`: Attach a jar/zip source to the currently opened binary class file. This command is only available in the editor context menu.
 
-*New in 0.56.0:*
-* - `Java:Detect and import Java projects`: Detect and import Java projects.
-
 Supported VS Code settings
 ==========================
 The following settings are supported:
