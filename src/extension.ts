@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, env, UIKind } from 'vscode';
+import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, env, UIKind, QuickPickItem, Disposable } from 'vscode';
 import { ExecuteCommandParams, ExecuteCommandRequest, LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, DidChangeConfigurationNotification, CancellationToken } from 'vscode-languageclient';
 import { LanguageClient } from 'vscode-languageclient/node';
 import { collectJavaExtensions, isContributedPartUpdated } from './plugin';
@@ -309,7 +309,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 				}
 
 				if (choice === "Yes") {
-					startStandardServer(context, requirements, clientOptions, workspacePath, resolve);
+					await startStandardServer(context, requirements, clientOptions, workspacePath, resolve);
 				}
 			});
 
@@ -348,7 +348,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 			}
 
 			if (requireStandardServer) {
-				startStandardServer(context, requirements, clientOptions, workspacePath, resolve);
+				await startStandardServer(context, requirements, clientOptions, workspacePath, resolve);
 			}
 
 			const onDidGrantWorkspaceTrust = (workspace as any).onDidGrantWorkspaceTrust;
@@ -375,10 +375,42 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 	});
 }
 
-function startStandardServer(context: ExtensionContext, requirements: requirements.RequirementsData, clientOptions: LanguageClientOptions, workspacePath: string, resolve: (value?: ExtensionAPI | PromiseLike<ExtensionAPI>) => void) {
+async function startStandardServer(context: ExtensionContext, requirements: requirements.RequirementsData, clientOptions: LanguageClientOptions, workspacePath: string, resolve: (value?: ExtensionAPI | PromiseLike<ExtensionAPI>) => void) {
 	if (standardClient.getClientStatus() !== ClientStatus.Uninitialized) {
 		return;
 	}
+
+	// todo: get cached paths from workspace storage.
+	let projectConfigurations: Uri[] = await getBuildFilesInWorkspace();
+	const hasMavenProject: boolean = projectConfigurations.some((uri) => uri.fsPath.endsWith("pom.xml"));
+	const hasGradleProject: boolean = projectConfigurations.some((uri) => uri.fsPath.endsWith(".gradle"));
+	if (hasMavenProject && hasGradleProject) {
+		const buildTool = await window.showInformationMessage("Multiple project configurations are found in workspace, would you like to open as:", "Maven", "Gradle");
+		if (buildTool === "Maven") {
+			projectConfigurations = projectConfigurations.filter((file) => !file.fsPath.endsWith(".gradle"));
+		} else if (buildTool === "Gradle") {
+			projectConfigurations = projectConfigurations.filter((file) => !file.fsPath.endsWith("pom.xml"));
+		} else {
+			// todo: default
+		}
+	}
+	const foldersContainingBuildFile: Set<string> = new Set();
+	for (const config of projectConfigurations) {
+		if (!config.fsPath.endsWith(".project")) {
+			foldersContainingBuildFile.add(path.dirname(config.fsPath));
+		}
+	}
+	projectConfigurations = projectConfigurations.filter((file) => {
+		const fsPath: string = file.fsPath;
+		if (fsPath.endsWith(".project")) {
+			return !foldersContainingBuildFile.has(path.dirname(fsPath));
+		}
+
+		return true;
+	});
+
+	clientOptions.initializationOptions.projectConfigurations = projectConfigurations.map((config) => config.toString());
+
 	if (apiManager.getApiInstance().serverMode === ServerMode.LIGHTWEIGHT) {
 		// Before standard server is ready, we are in hybrid.
 		apiManager.getApiInstance().serverMode = ServerMode.HYBRID;
@@ -407,6 +439,24 @@ async function workspaceContainsBuildFiles(): Promise<boolean> {
 	}
 
 	return false;
+}
+
+async function getBuildFilesInWorkspace(): Promise<Uri[]> {
+	const buildFiles: Uri[] = [];
+	const inclusionPatterns: string[] = getBuildFilePatterns();
+	inclusionPatterns.push("**/.project");
+	const inclusionPatternsFromNegatedExclusion: string[] = getInclusionPatternsFromNegatedExclusion();
+	if (inclusionPatterns.length > 0 && inclusionPatternsFromNegatedExclusion.length > 0) {
+		buildFiles.push(...await workspace.findFiles(convertToGlob(inclusionPatterns, inclusionPatternsFromNegatedExclusion), null /*force not use default exclusion*/));
+	}
+
+	const inclusionBlob: string = convertToGlob(inclusionPatterns);
+	const exclusionBlob: string = getExclusionBlob();
+	if (inclusionBlob) {
+		buildFiles.push(...await workspace.findFiles(inclusionBlob, exclusionBlob));
+	}
+
+	return buildFiles;
 }
 
 async function promptUserForStandardServer(config: WorkspaceConfiguration): Promise<boolean> {

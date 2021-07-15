@@ -1,11 +1,11 @@
 'use strict';
 
-import { ExtensionContext, window, workspace, commands, Uri, ProgressLocation, ViewColumn, EventEmitter, extensions, Location, languages, CodeActionKind, TextEditor, CancellationToken } from "vscode";
+import { ExtensionContext, window, workspace, commands, Uri, ProgressLocation, ViewColumn, EventEmitter, extensions, Location, languages, CodeActionKind, TextEditor, CancellationToken, Range, Diagnostic, DiagnosticSeverity } from "vscode";
 import { Commands } from "./commands";
 import { serverStatus, ServerStatusKind } from "./serverStatus";
 import { prepareExecutable, awaitServerConnection } from "./javaServerStarter";
 import { getJavaConfig, applyWorkspaceEdit } from "./extension";
-import { LanguageClientOptions, Position as LSPosition, Location as LSLocation, MessageType, TextDocumentPositionParams, ConfigurationRequest, ConfigurationParams } from "vscode-languageclient";
+import { LanguageClientOptions, Position as LSPosition, Location as LSLocation, MessageType, TextDocumentPositionParams, ConfigurationRequest, ConfigurationParams, LogMessageNotification, ShowMessageNotification } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 import { CompileWorkspaceRequest, CompileWorkspaceStatus, SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ProjectConfigurationUpdateRequest, FeatureStatus, StatusNotification, ProgressReportNotification, ActionableNotification, ExecuteClientCommandRequest, ServerNotification, EventNotification, EventType, LinkLocation, FindLinks } from "./protocol";
 import { setGradleWrapperChecksum, excludeProjectSettingsFiles, ServerMode } from "./settings";
@@ -90,6 +90,18 @@ export class StandardLanguageClient {
 		this.languageClient.registerProposedFeatures();
 
 		this.languageClient.onReady().then(() => {
+			// this.languageClient.onNotification(LogMessageNotification.type, (message) => {
+			// 	if (message.message.startsWith("[Action],")) {
+			// 		const data = message.message.split(",");
+			// 		const diagnostics = languages.createDiagnosticCollection();
+			// 		diagnostics.set(Uri.file(data[1] as string), [new Diagnostic(
+			// 			new Range(0, 0, 0, 1),
+			// 			data[2],
+			// 			DiagnosticSeverity.Warning,
+			// 		)]);
+			// 	}
+			// 	this.languageClient.outputChannel.appendLine(message.message);
+			// });
 			this.languageClient.onNotification(StatusNotification.type, (report) => {
 				switch (report.type) {
 					case 'ServiceReady':
